@@ -1,70 +1,69 @@
 #include <iostream>
-#include <iomanip>
+#include <vector>
 #include <string>
-#include <map>
+#include <iomanip>
 using namespace std;
 
-// Function to convert grade to grade point
 float getGradePoint(const string& grade) {
-    map<string, float> gradeMap = {
-        {"A+", 4.0}, {"A", 4.0}, {"A-", 3.7},
-        {"B+", 3.3}, {"B", 3.0}, {"B-", 2.7},
-        {"C+", 2.3}, {"C", 2.0}, {"C-", 1.7},
-        {"D+", 1.3}, {"D", 1.0}, {"F", 0.0}
-    };
-
-    auto it = gradeMap.find(grade);
-    if (it != gradeMap.end()) {
-        return it->second;
-    } else {
-        return -1; // Invalid grade
-    }
+    if (grade == "O") return 10.0;
+    else if (grade == "A+") return 9.0;
+    else if (grade == "A") return 8.0;
+    else if (grade == "B+") return 7.0;
+    else if (grade == "B") return 6.0;
+    else if (grade == "C") return 5.0;
+    else if (grade == "D") return 4.0;
+    else return 0.0;  // F grade
 }
 
 int main() {
-    int numCourses;
-    cout << "Enter the number of courses: ";
-    cin >> numCourses;
+    int numSubjects;
+    cout << "Enter the number of subjects: ";
+    cin >> numSubjects;
 
-    float totalCredits = 0, totalGradePoints = 0;
-    string grade;
-    float creditHours;
+    vector<string> subjects(numSubjects);
+    vector<string> grades(numSubjects);
+    vector<int> credits(numSubjects);
+    vector<float> gradePoints(numSubjects);
 
-    cout << fixed << setprecision(2);
+    // Input subject names, grade points, and credit points
+    for (int i = 0; i < numSubjects; i++) {
+        cout << "Enter the name of subject " << i + 1 << ": ";
+        cin >> subjects[i];
 
-    for (int i = 1; i <= numCourses; ++i) {
-        cout << "\nCourse " << i << ":\n";
-        
-        while (true) {
-            cout << "Enter grade (e.g., A, B+, C-): ";
-            cin >> grade;
-            if (getGradePoint(grade) != -1) break;
-            else cout << "Invalid grade. Please try again.\n";
-        }
+        cout << "Enter the grade (O, A+, A, B+, B, C, D, F) for " << subjects[i] << ": ";
+        cin >> grades[i];
 
-        cout << "Enter credit hours: ";
-        cin >> creditHours;
+        gradePoints[i] = getGradePoint(grades[i]);
 
-        float gradePoint = getGradePoint(grade);
-        float courseGradePoints = gradePoint * creditHours;
-
-        totalCredits += creditHours;
-        totalGradePoints += courseGradePoints;
-
-        cout << "Grade = " << grade
-             << ", Credit Hours = " << creditHours
-             << ", Grade Points = " << courseGradePoints << endl;
+        cout << "Enter the credit for " << subjects[i] << ": ";
+        cin >> credits[i];
     }
 
-    if (totalCredits == 0) {
-        cout << "\nNo credits entered. Cannot calculate CGPA.\n";
-    } else {
-        float cgpa = totalGradePoints / totalCredits;
-        cout << "\n--- Summary ---\n";
-        cout << "Total Credits: " << totalCredits << endl;
-        cout << "Total Grade Points: " << totalGradePoints << endl;
-        cout << "Final CGPA: " << cgpa << endl;
+    // Display the table with subjects, grade points, grades, and credits
+    cout << "\n-------------------------------------------\n";
+    cout << setw(20) << left << "Subject"
+         << setw(10) << "Grade"
+         << setw(15) << "Grade Points"
+         << setw(10) << "Credits" << endl;
+    cout << "-------------------------------------------\n";
+    
+    for (int i = 0; i < numSubjects; i++) {
+        cout << setw(20) << left << subjects[i]
+             << setw(10) << grades[i]
+             << setw(15) << gradePoints[i]
+             << setw(10) << credits[i] << endl;
     }
+
+    // Calculate CGPA
+    float totalWeightedGradePoints = 0;
+    int totalCredits = 0;
+    for (int i = 0; i < numSubjects; i++) {
+        totalWeightedGradePoints += gradePoints[i] * credits[i];
+        totalCredits += credits[i];
+    }
+
+    float cgpa = totalWeightedGradePoints / totalCredits;
+    cout << "\nYour CGPA is: " << cgpa << endl;
 
     return 0;
 }
